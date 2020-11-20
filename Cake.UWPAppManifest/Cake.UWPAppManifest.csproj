@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Conrad-Emanuel Mey</Authors>
     <Company>Develappers GmbH</Company>
-    <Description>Test - Do not use yet</Description>
+    <Description>Cake Add-In, that allows the Manipulation of the UWP appxmanifest</Description>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>Develappers.Cake.UWPAppManifest</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

@@ -75,55 +75,55 @@ namespace Cake.UWPAppManifest
             }
         }
 
-        public string IdentityName
+        public string Identity_Name
         {
             get => (string) _identity.Attribute("Name");
             set => _identity.SetAttributeValue("Name", NullIfEmpty(value));
         }
 
-        public string IdentityPublisher
+        public string Identity_Publisher
         {
             get => (string) _identity.Attribute("Publisher");
             set => _identity.SetAttributeValue("Publisher", NullIfEmpty(value));
         }
 
-        public string IdentityVersion
+        public string Identity_Version
         {
             get => (string) _identity.Attribute("Version");
             set => _identity.SetAttributeValue("Version", NullIfEmpty(value));
         }
 
-        public string PhoneIdentityPhoneProductId
+        public string PhoneIdentity_PhoneProductId
         {
             get => (string) _phoneIdentity.Attribute("PhoneProductId");
             set => _phoneIdentity.SetAttributeValue("PhoneProductId", NullIfEmpty(value));
         }
 
-        public string PhoneIdentityPhonePublisherId
+        public string PhoneIdentity_PhonePublisherId
         {
             get => (string) _phoneIdentity.Attribute("PhonePublisherId");
             set => _phoneIdentity.SetAttributeValue("PhonePublisherId", NullIfEmpty(value));
         }
 
-        public string PropertiesDisplayName
+        public string Properties_DisplayName
         {
             get => _properties.Element(_nsDoc + "DisplayName")?.Value;
             set => _properties.SetElementValue(_nsDoc + "DisplayName", NullIfEmpty(value));
         }
 
-        public string PropertiesPublisherDisplayName
+        public string Properties_PublisherDisplayName
         {
             get => _properties.Element(_nsDoc + "PublisherDisplayName")?.Value;
             set => _properties.SetElementValue(_nsDoc + "PublisherDisplayName", NullIfEmpty(value));
         }
 
-        public string PropertiesLogo
+        public string Properties_Logo
         {
             get => _properties.Element(_nsDoc + "Logo")?.Value;
             set => _properties.SetElementValue(_nsDoc + "Logo", NullIfEmpty(value));
         }
 
-        public string DependenciesTargetDeviceFamilyName
+        public string Dependencies_TargetDeviceFamilyName
         {
             get => (string) _dependencies.Element(_nsDoc + "TargetDeviceFamily")?.Attribute("Name");
             set
@@ -134,7 +134,7 @@ namespace Cake.UWPAppManifest
             }
         }
 
-        public string DependenciesTargetDeviceFamilyMinVersion
+        public string Dependencies_TargetDeviceFamily_MinVersion
         {
             get => (string)_dependencies.Element(_nsDoc + "TargetDeviceFamily")?.Attribute("MinVersion");
             set
@@ -146,7 +146,7 @@ namespace Cake.UWPAppManifest
             }
         }
 
-        public string DependenciesTargetDeviceFamilyMaxVersionTested
+        public string Dependencies_TargetDeviceFamily_MaxVersionTested
         {
             get => (string)_dependencies.Element(_nsDoc + "TargetDeviceFamily")?.Attribute("MaxVersionTested");
             set
@@ -158,7 +158,7 @@ namespace Cake.UWPAppManifest
             }
         }
 
-        public string ResourcesResourceLanguage
+        public string Resources_Resource_Language
         {
             get => (string) _resources.Element(_nsDoc + "Resource")?.Attribute("Language");
             set
@@ -211,7 +211,7 @@ namespace Cake.UWPAppManifest
             }
         }
 
-        public string CapabilitiesCapabilityName
+        public string Capabilities_Capability_Name
         {
             get => _capabilities.Element(_nsDoc + "Capability")?.Attribute("Name")?.Value;
             set
@@ -317,15 +317,46 @@ namespace Cake.UWPAppManifest
             {
                 var split = part.Split(new[] { '%' }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (split.Length == 1 && part == pathParts.Last())
-                    element?.SetElementValue(split[0], NullIfEmpty(value));
-                if (split.Length == 1 && part != pathParts.Last())
-                    element = element?.Element(_nsDoc + split[0]);
-                if (split.Length == 2 && part == pathParts.Last())
-                    element?.SetElementValue(XName.Get("{" + split[0] + "}" + split[1]), NullIfEmpty(value));
-                if (split.Length == 2 && part != pathParts.Last())
-                    element = element?.Element(XName.Get("{" + split[0] + "}" + split[1]));
+                switch (split.Length)
+                {
+                    case 1:
+                        element = element?.Element(_nsDoc + split[0]);
+                        break;
+                    case 2:
+                        element = element?.Element(XName.Get("{" + split[0] + "}" + split[1]));
+                        break;
+                }
             }
+
+            element?.SetValue(value);
+        }
+
+        /// <summary>
+        /// Adds an element as a child to the last element of the path, seperator for elements is '$', seperator for namespace is '%'.
+        /// </summary>
+        /// <param name="path">The path, beginning at the root.</param>
+        /// <param name="name">The name of the new element.</param>
+        public void AddElement(string path, string name)
+        {
+            var pathParts = path.Split(new[] { '$' }, StringSplitOptions.RemoveEmptyEntries);
+
+            XElement element = _doc.Root;
+            foreach (var part in pathParts)
+            {
+                var split = part.Split(new[] { '%' }, StringSplitOptions.RemoveEmptyEntries);
+
+                switch (split.Length)
+                {
+                    case 1:
+                        element = element?.Element(_nsDoc + split[0]);
+                        break;
+                    case 2:
+                        element = element?.Element(XName.Get("{" + split[0] + "}" + split[1]));
+                        break;
+                }
+            }
+
+            element?.Add(new XElement(_nsDoc + name));
         }
 
         public static UWPAppManifest Create()
