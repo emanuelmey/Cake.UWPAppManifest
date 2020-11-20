@@ -222,6 +222,112 @@ namespace Cake.UWPAppManifest
             }
         }
 
+        /// <summary>
+        /// Reads the attribute value given by the path, seperator for elements is '$', seperator for namespace is '%'.
+        /// </summary>
+        /// <param name="path">The path, beginning at the root.</param>
+        /// <returns>The attribute value as a string.</returns>
+        public string ReadAttributeValue(string path)
+        {
+            var pathParts = path.Split(new[]{ '$' }, StringSplitOptions.RemoveEmptyEntries);
+
+            XElement element = _doc.Root;
+            XAttribute attribute = null;
+            foreach (var part in pathParts)
+            {
+                var split = part.Split(new[] { '%' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (split.Length == 1 && part == pathParts.Last())
+                    attribute = element?.Attribute(split[0]);
+                if (split.Length == 1 && part != pathParts.Last())
+                    element = element?.Element(_nsDoc + split[0]);
+                if (split.Length == 2 && part == pathParts.Last()) 
+                    attribute = element?.Attribute(XName.Get("{" + split[0] + "}" + split[1]));
+                if (split.Length == 2 && part != pathParts.Last())
+                    element = element?.Element(XName.Get("{" + split[0] + "}" + split[1]));
+            }
+
+            return attribute?.Value;
+        }
+
+        /// <summary>
+        /// Reads the element value given by the path, seperator for elements is '$', seperator for namespace is '%'.
+        /// </summary>
+        /// <param name="path">The path, beginning at the root.</param>
+        /// <returns>The element Value as a string.</returns>
+        public string ReadElementValue(string path)
+        {
+            var pathParts = path.Split(new[] { '$' }, StringSplitOptions.RemoveEmptyEntries);
+
+            XElement element = _doc.Root;
+            foreach (var part in pathParts)
+            {
+                var split = part.Split(new[] { '%' }, StringSplitOptions.RemoveEmptyEntries);
+
+                switch (split.Length)
+                {
+                    case 1:
+                        element = element?.Element(_nsDoc + split[0]);
+                        break;
+                    case 2:
+                        element = element?.Element(XName.Get("{" + split[0] + "}" + split[1]));
+                        break;
+                }
+            }
+
+            return element?.Value;
+        }
+
+        /// <summary>
+        /// Writes the attribute value given by the path, seperator for elements is '$', seperator for namespace is '%'.
+        /// </summary>
+        /// <param name="path">The path, beginning at the root.</param>
+        /// <param name="value">The value in string form.</param>
+        public void WriteAttributeValue(string path, string value)
+        {
+            var pathParts = path.Split(new[] { '$' }, StringSplitOptions.RemoveEmptyEntries);
+
+            XElement element = _doc.Root;
+            foreach (var part in pathParts)
+            {
+                var split = part.Split(new[] { '%' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (split.Length == 1 && part == pathParts.Last())
+                    element?.SetAttributeValue(split[0], NullIfEmpty(value));
+                if (split.Length == 1 && part != pathParts.Last())
+                    element = element?.Element(_nsDoc + split[0]);
+                if (split.Length == 2 && part == pathParts.Last())
+                   element?.SetAttributeValue(XName.Get("{" + split[0] + "}" + split[1]), NullIfEmpty(value));
+                if (split.Length == 2 && part != pathParts.Last())
+                    element = element?.Element(XName.Get("{" + split[0] + "}" + split[1]));
+            }
+        }
+
+        /// <summary>
+        /// Writes the element value given by the path, seperator for elements is '$', seperator for namespace is '%'.
+        /// </summary>
+        /// <param name="path">The path, beginning at the root.</param>
+        /// <param name="value">The value in string form.</param>
+        public void WriteElementValue(string path, string value)
+        {
+            var pathParts = path.Split(new[] { '$' }, StringSplitOptions.RemoveEmptyEntries);
+
+            XElement element = _doc.Root;
+            foreach (var part in pathParts)
+            {
+                var split = part.Split(new[] { '%' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (split.Length == 1 && part == pathParts.Last())
+                    element?.SetElementValue(split[0], NullIfEmpty(value));
+                if (split.Length == 1 && part != pathParts.Last())
+                    element = element?.Element(_nsDoc + split[0]);
+                if (split.Length == 2 && part == pathParts.Last())
+                    element?.SetElementValue(XName.Get("{" + split[0] + "}" + split[1]), NullIfEmpty(value));
+                if (split.Length == 2 && part != pathParts.Last())
+                    element = element?.Element(XName.Get("{" + split[0] + "}" + split[1]));
+            }
+        }
+
         public static UWPAppManifest Create()
         {
             return new UWPAppManifest(XDocument.Parse(

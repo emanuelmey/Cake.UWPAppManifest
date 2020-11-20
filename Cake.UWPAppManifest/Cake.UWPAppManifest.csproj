@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Conrad-Emanuel Mey</Authors>
+    <Company>Develappers GmbH</Company>
+    <Description>Test - Do not use yet</Description>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>Develappers.Cake.UWPAppManifest</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/emanuelmey/Cake.UWPAppManifest</RepositoryUrl>
+    <PackageTags>Cake, Add-In, UWP, Manifest</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

@@ -147,5 +147,17 @@ namespace Cake.UWPAppManifest.Test
 
             modifiedManifest.CapabilitiesCapabilityName.Should().Be("internetClient");
         }
+
+        [Fact]
+        public void FlexibleTest()
+        {
+            var manifest = Cake.DeserializeAppManifest(new FilePath("Package.appxmanifest"));
+            
+            manifest.WriteAttributeValue("Applications$Application$http://schemas.microsoft.com/appx/manifest/uap/windows10%VisualElements$DisplayName", "Hello");
+            manifest.WriteElementValue("Properties$DisplayName", "World!");
+
+            manifest.ReadAttributeValue("Applications$Application$http://schemas.microsoft.com/appx/manifest/uap/windows10%VisualElements$DisplayName").Should().Be("Hello");
+            manifest.ReadElementValue("Properties$DisplayName").Should().Be("World!");
+        }
     }
 }
